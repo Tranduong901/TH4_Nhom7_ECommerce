@@ -13,6 +13,6 @@ void main() {
   testWidgets('AppRoot is rendered', (WidgetTester tester) async {
     await tester.pumpWidget(const AppRoot());
 
-    expect(find.text('MultiProvider configured successfully.'), findsOneWidget);
+    expect(find.text('Chưa có tài khoản? Đăng ký ngay'), findsOneWidget);
   });
 }

@@ -7,6 +7,38 @@ class CartProvider extends ChangeNotifier {
   final List<CartItem> _items = [];
 
   List<CartItem> get items => List.unmodifiable(_items);
+  List<CartItem> get selectedItems =>
+      List.unmodifiable(_items.where((item) => item.isSelected));
+
+  bool get areAllSelected =>
+      _items.isNotEmpty && _items.every((item) => item.isSelected);
+
+  bool get hasSelectedItems => _items.any((item) => item.isSelected);
+
+  bool get hasItems => _items.isNotEmpty;
+
+  bool? get selectAllValue {
+    if (_items.isEmpty) {
+      return false;
+    }
+
+    final bool allSelected = _items.every((item) => item.isSelected);
+    if (allSelected) {
+      return true;
+    }
+
+    final bool noneSelected = _items.every((item) => !item.isSelected);
+    if (noneSelected) {
+      return false;
+    }
+
+    return null;
+  }
+
+  int get totalItemCount =>
+      _items.fold<int>(0, (sum, item) => sum + item.quantity);
+
+  int get itemCount => totalItemCount;
 
   void addItem(Product product) {
     final int existingIndex = _items.indexWhere(
@@ -84,6 +116,11 @@ class CartProvider extends ChangeNotifier {
     for (final item in _items) {
       item.isSelected = value;
     }
+    notifyListeners();
+  }
+
+  void clearCart() {
+    _items.clear();
     notifyListeners();
   }
 }
