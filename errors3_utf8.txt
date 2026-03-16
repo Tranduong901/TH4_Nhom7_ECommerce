@@ -1,0 +1,17 @@
+﻿Analyzing TH4_Nhom7_ECommerce...                                
+
+   info - The private field _banners could be 'final' - lib\providers\product_provider.dart:22:16 - prefer_final_fields
+   info - Use 'const' with the constructor to improve performance - lib\screens\checkout_screen.dart:79:22 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\checkout_screen.dart:81:27 - prefer_const_literals_to_create_immutables
+   info - Unnecessary use of 'toList' in a spread - lib\screens\checkout_screen.dart:146:23 - unnecessary_to_list_in_spreads
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\checkout_screen.dart:178:21 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\checkout_screen.dart:180:21 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\checkout_screen.dart:185:21 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\checkout_screen.dart:187:21 - deprecated_member_use
+warning - Unused import: 'package:intl/intl.dart' - lib\screens\product_detail_screen.dart:4:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\product_detail_screen.dart:57:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\product_detail_screen.dart:221:45 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\screens\product_detail_screen.dart:371:20 - prefer_const_constructors
+   info - Don't invoke 'print' in production code - lib\services\cloudinary_service.dart:52:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\cloudinary_service.dart:56:7 - avoid_print
+
