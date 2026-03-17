@@ -22,7 +22,8 @@ class CartProvider with ChangeNotifier {
     return total;
   }
 
-  bool get isSelectAll => _items.isNotEmpty && _items.every((item) => item.isSelected);
+  bool get isSelectAll =>
+      _items.isNotEmpty && _items.every((item) => item.isSelected);
 
   CartProvider() {
     _loadCart();
@@ -42,19 +43,20 @@ class CartProvider with ChangeNotifier {
   }
 
   void addToCart(Product product, String size, String color, int quantity) {
-    int index = _items.indexWhere((item) => 
-      item.product.id == product.id && item.size == size && item.color == color);
+    int index = _items.indexWhere((item) =>
+        item.product.id == product.id &&
+        item.size == size &&
+        item.color == color);
 
     if (index >= 0) {
       _items[index].quantity += quantity;
     } else {
       _items.add(CartItem(
-          product: product, 
-          size: size, 
-          color: color, 
+          product: product,
+          size: size,
+          color: color,
           quantity: quantity,
-          isSelected: true // Auto select when adding
-      ));
+          isSelected: true));
     }
     _saveCart();
   }
@@ -77,7 +79,7 @@ class CartProvider with ChangeNotifier {
 
   void toggleSelectAll(bool value) {
     for (var item in _items) {
-      // Don't change if the items are already in correct checkout state 
+      // Don't change if the items are already in correct checkout state
       item.isSelected = value;
     }
     _saveCart();

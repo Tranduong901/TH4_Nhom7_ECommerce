@@ -11,9 +11,10 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Fix lỗi ký tự $ trên Web bằng cách dùng escape hoặc biến riêng
+    // Fix lỗi ký tự $ trên Web bằng cách dùng escape hoặc
     const String dollarSign = '\$';
-    final currencyFormat = NumberFormat.currency(locale: 'en_US', symbol: dollarSign);
+    final currencyFormat =
+        NumberFormat.currency(locale: 'en_US', symbol: dollarSign);
 
     return InkWell(
       onTap: () {
@@ -34,15 +35,18 @@ class ProductCard extends StatelessWidget {
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(10)),
                     child: Hero(
                       tag: 'product_${product.id}',
                       child: CachedNetworkImage(
                         imageUrl: product.image,
                         width: double.infinity,
                         fit: BoxFit.contain,
-                        placeholder: (context, url) => Container(color: Colors.grey[100]),
-                        errorWidget: (context, url, error) => const Icon(Icons.error),
+                        placeholder: (context, url) =>
+                            Container(color: Colors.grey[100]),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
                     ),
                   ),
@@ -50,12 +54,17 @@ class ProductCard extends StatelessWidget {
                     top: 5,
                     left: 5,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text('Mall', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                      child: const Text('Mall',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -70,7 +79,8 @@ class ProductCard extends StatelessWidget {
                     product.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: 12),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -78,9 +88,14 @@ class ProductCard extends StatelessWidget {
                     children: [
                       Text(
                         currencyFormat.format(product.price),
-                        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14),
                       ),
-                      Text('Đã bán ${product.rating.count}', style: const TextStyle(fontSize: 9, color: Colors.grey)),
+                      Text('Đã bán ${product.rating.count}',
+                          style:
+                              const TextStyle(fontSize: 9, color: Colors.grey)),
                     ],
                   ),
                 ],
