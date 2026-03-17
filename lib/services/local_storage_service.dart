@@ -19,7 +19,10 @@ class LocalStorageService {
       return [];
     }
 
-    return jsonItems.map((jsonStr) => CartItem.fromJson(jsonDecode(jsonStr))).toList();
+    final items = jsonItems.map((jsonStr) => CartItem.fromJson(jsonDecode(jsonStr))).toList();
+    // ensure newest items (by addedAt) are first when loading
+    items.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+    return items;
   }
 
   Future<void> clearCart() async {

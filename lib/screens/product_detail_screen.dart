@@ -286,13 +286,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold)),
-                  child: IconButton(
-                      icon: const Icon(Icons.shopping_cart_outlined,
-                          color: Colors.white, size: 24),
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const CartScreen()))),
+            child: IconButton(
+            icon: const Icon(Icons.shopping_cart_outlined,
+              color: Colors.white, size: 24),
+            onPressed: () => Navigator.push(context, CartScreen.route())),
                 ),
               ),
             ),
@@ -630,8 +627,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   Container(width: 1, height: 30, color: Colors.grey[300]),
                   InkWell(
-                    onTap: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const CartScreen())),
+                    onTap: () => Navigator.push(context, CartScreen.route()),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
