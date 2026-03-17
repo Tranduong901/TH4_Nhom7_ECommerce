@@ -9,11 +9,11 @@ class ProductProvider with ChangeNotifier {
   bool _isLoading = false;
   bool _hasMore = true;
   String _error = '';
-  
+
   // Pagination
   int _currentLimit = 10;
   final int _limitStep = 10;
-  
+
   // Categories
   List<String> _categories = [];
   bool _isLoadingCategories = false;
@@ -75,10 +75,10 @@ class ProductProvider with ChangeNotifier {
 
     try {
       final newProducts = await _apiService.getProducts(limit: _currentLimit);
-      
+
       // FakeStore API returns maximum 20 items.
       if (newProducts.length <= _products.length) {
-         _hasMore = false;
+        _hasMore = false;
       } else {
         _products = newProducts;
         _currentLimit += _limitStep;
