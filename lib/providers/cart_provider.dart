@@ -8,6 +8,7 @@ class CartProvider with ChangeNotifier {
   List<CartItem> _items = [];
   bool _isLoading = true;
 
+  // Expose the internal list which is maintained newest-first by add/load logic.
   List<CartItem> get items => _items;
   bool get isLoading => _isLoading;
   int get cartCount => _items.length;
@@ -47,16 +48,23 @@ class CartProvider with ChangeNotifier {
         item.product.id == product.id &&
         item.size == size &&
         item.color == color);
-
     if (index >= 0) {
+      // existing item: increase quantity, update timestamp and move to front
       _items[index].quantity += quantity;
+      _items[index].addedAt = DateTime.now();
+      final updated = _items.removeAt(index);
+      _items.insert(0, updated);
     } else {
-      _items.add(CartItem(
-          product: product,
-          size: size,
-          color: color,
-          quantity: quantity,
-          isSelected: true));
+      // new item: insert at front so newest shows up first
+      _items.insert(
+          0,
+          CartItem(
+              product: product,
+              size: size,
+              color: color,
+              quantity: quantity,
+              isSelected: true,
+              addedAt: DateTime.now()));
     }
     _saveCart();
   }
@@ -69,6 +77,23 @@ class CartProvider with ChangeNotifier {
 
   void removeItem(int index) {
     _items.removeAt(index);
+    _saveCart();
+  }
+
+  /// Remove item and return it (useful for undo operations)
+  CartItem removeItemAt(int index) {
+    final removed = _items.removeAt(index);
+    _saveCart();
+    return removed;
+  }
+
+  /// Insert an item at specific index (useful for undo)
+  void insertItemAt(int index, CartItem item) {
+    if (index < 0 || index > _items.length) {
+      _items.insert(0, item);
+    } else {
+      _items.insert(index, item);
+    }
     _saveCart();
   }
 

@@ -64,9 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           badgeStyle: const badges.BadgeStyle(badgeColor: Colors.white),
                           badgeContent: Text('${cart.cartCount}', 
                             style: const TextStyle(color: Colors.blueAccent, fontSize: 10, fontWeight: FontWeight.bold)),
-                          child: IconButton(
+                            child: IconButton(
                             icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 30),
-                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen())),
+                            onPressed: () => Navigator.push(context, CartScreen.route()),
                           ),
                         ),
                       ),
