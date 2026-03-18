@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart'; // Đảm bảo anh đã copy file này sang TH4_Nhom7_ECommerce/lib/
 import 'providers/cart_provider.dart';
-import 'screens/home_screen.dart';
+import 'providers/order_provider.dart';
+import 'screens/main_screen.dart';
 
 import 'providers/product_provider.dart';
 
@@ -21,6 +22,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: const MyEcommerceApp(),
     ),
@@ -37,10 +39,11 @@ class MyEcommerceApp extends StatelessWidget {
       title: 'TH4 - ECommerce Nhóm 7',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent, primary: Colors.blueAccent),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blueAccent, primary: Colors.blueAccent),
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
       ),
-      home: const HomeScreen(),
+      home: const MainScreen(),
     );
   }
 }
