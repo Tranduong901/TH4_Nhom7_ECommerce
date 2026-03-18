@@ -114,4 +114,19 @@ class CartProvider with ChangeNotifier {
     _items.removeWhere((item) => item.isSelected);
     _saveCart();
   }
+
+  void removePurchasedItems(List<CartItem> purchasedItems) {
+    for (final purchased in purchasedItems) {
+      final index = _items.indexWhere((item) =>
+          item.product.id == purchased.product.id &&
+          item.size == purchased.size &&
+          item.color == purchased.color &&
+          item.addedAt.millisecondsSinceEpoch ==
+              purchased.addedAt.millisecondsSinceEpoch);
+      if (index >= 0) {
+        _items.removeAt(index);
+      }
+    }
+    _saveCart();
+  }
 }

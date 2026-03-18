@@ -215,10 +215,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           content: Text('Đã thêm sản phẩm vào giỏ!'),
                           backgroundColor: Colors.green));
                     } else {
+                      final selectedItems = context
+                          .read<CartProvider>()
+                          .items
+                          .where((i) => i.isSelected)
+                          .toList();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const CheckoutScreen()));
+                              builder: (_) => CheckoutScreen(
+                                    selectedItems: selectedItems,
+                                  )));
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -286,10 +293,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold)),
-            child: IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined,
-              color: Colors.white, size: 24),
-            onPressed: () => Navigator.push(context, CartScreen.route())),
+                  child: IconButton(
+                      icon: const Icon(Icons.shopping_cart_outlined,
+                          color: Colors.white, size: 24),
+                      onPressed: () =>
+                          Navigator.push(context, CartScreen.route())),
                 ),
               ),
             ),
