@@ -43,6 +43,9 @@ class MyEcommerceApp extends StatelessWidget {
             seedColor: Colors.blueAccent, primary: Colors.blueAccent),
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
       ),
+      routes: {
+        '/home': (context) => const MainScreen(),
+      },
       home: const MainScreen(),
     );
   }

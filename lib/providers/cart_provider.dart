@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_item.dart';
 import '../models/product.dart';
-import '../services/local_storage_service.dart';
 
 class CartProvider with ChangeNotifier {
-  final LocalStorageService _storageService = LocalStorageService();
+  static const String _cartStorageKey = 'CART_DATA_JSON';
   List<CartItem> _items = [];
   bool _isLoading = true;
 
@@ -27,20 +28,40 @@ class CartProvider with ChangeNotifier {
       _items.isNotEmpty && _items.every((item) => item.isSelected);
 
   CartProvider() {
-    _loadCart();
+    loadCartFromLocal();
   }
 
-  Future<void> _loadCart() async {
+  Future<void> loadCartFromLocal() async {
     _isLoading = true;
     notifyListeners();
-    _items = await _storageService.loadCart();
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_cartStorageKey);
+    if (raw == null || raw.isEmpty) {
+      _items = [];
+    } else {
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      _items = decoded
+          .map((item) => CartItem.fromJson(item as Map<String, dynamic>))
+          .toList();
+      _items.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+    }
     _isLoading = false;
     notifyListeners();
   }
 
+  Future<void> saveCartToLocal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = jsonEncode(_items.map((item) => item.toJson()).toList());
+    await prefs.setString(_cartStorageKey, jsonString);
+  }
+
   Future<void> _saveCart() async {
-    await _storageService.saveCart(_items);
+    await saveCartToLocal();
     notifyListeners();
+  }
+
+  void addItem(Product product, String size, String color, int quantity) {
+    addToCart(product, size, color, quantity);
   }
 
   void addToCart(Product product, String size, String color, int quantity) {
@@ -112,6 +133,11 @@ class CartProvider with ChangeNotifier {
 
   void clearSelectedItems() {
     _items.removeWhere((item) => item.isSelected);
+    _saveCart();
+  }
+
+  void clearCart() {
+    _items.clear();
     _saveCart();
   }
 }

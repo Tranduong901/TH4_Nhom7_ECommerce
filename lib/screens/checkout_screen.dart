@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../models/cart_item.dart';
 import '../models/order.dart';
 import '../providers/cart_provider.dart';
 import '../providers/order_provider.dart';
-import 'main_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  const CheckoutScreen({super.key});
+  final List<CartItem> selectedItems;
+
+  const CheckoutScreen({super.key, required this.selectedItems});
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -40,7 +42,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final cart = context.read<CartProvider>();
     final orderProvider = context.read<OrderProvider>();
-    final selectedItems = cart.items.where((i) => i.isSelected).toList();
+    final selectedItems =
+        widget.selectedItems.where((i) => i.isSelected).toList();
+
+    if (selectedItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không có sản phẩm đã chọn để đặt hàng')),
+      );
+      return;
+    }
 
     // Create order
     final order = Order.create(
@@ -78,10 +88,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     // Remove selected items from cart
                     cart.clearSelectedItems();
 
-                    // Navigate to home
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => const MainScreen()),
-                        (route) => false);
+                    // Navigate to /home
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/home', (route) => false);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
@@ -99,8 +108,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cart = context.watch<CartProvider>();
-    final selectedItems = cart.items.where((i) => i.isSelected).toList();
+    final selectedItems =
+        widget.selectedItems.where((i) => i.isSelected).toList();
+    final selectedTotal = selectedItems.fold<double>(
+      0,
+      (sum, item) => sum + (item.product.price * item.quantity),
+    );
 
     if (selectedItems.isEmpty) {
       return Scaffold(
@@ -248,7 +261,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         children: [
                           Text(
                               'Tổng số tiền (${selectedItems.length} sản phẩm):'),
-                          Text('\$${cart.totalAmount.toStringAsFixed(2)}',
+                          Text('\$${selectedTotal.toStringAsFixed(2)}',
                               style: const TextStyle(
                                   color: Colors.blueAccent,
                                   fontWeight: FontWeight.bold,
@@ -317,7 +330,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 children: [
                   const Text('Tổng thanh toán',
                       style: TextStyle(fontSize: 13, color: Colors.black87)),
-                  Text('\$${cart.totalAmount.toStringAsFixed(2)}',
+                  Text('\$${selectedTotal.toStringAsFixed(2)}',
                       style: const TextStyle(
                           color: Colors.blueAccent,
                           fontSize: 20,

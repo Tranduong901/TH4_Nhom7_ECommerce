@@ -30,12 +30,88 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final productProvider =
+          Provider.of<ProductProvider>(context, listen: false);
       if (!productProvider.isLoading && productProvider.hasMore) {
         productProvider.fetchProducts(refresh: false);
       }
     }
+  }
+
+  // Vietnamese Categories with Icons
+  final List<Map<String, dynamic>> _vietnameseCategories = [
+    {'name': 'Thời trang', 'icon': Icons.checkroom, 'color': Color(0xFFFF6B6B)},
+    {
+      'name': 'Điện thoại',
+      'icon': Icons.smartphone,
+      'color': Color(0xFF4ECDC4)
+    },
+    {'name': 'Mỹ phẩm', 'icon': Icons.spa, 'color': Color(0xFFFFE66D)},
+    {'name': 'Đồ gia dụng', 'icon': Icons.kitchen, 'color': Color(0xFF95E1D3)},
+    {'name': 'Phụ kiện', 'icon': Icons.backpack, 'color': Color(0xFFC7CEEA)},
+    {'name': 'Giày dép', 'icon': Icons.checkroom, 'color': Color(0xFFFF9E64)},
+    {'name': 'Đồng hồ', 'icon': Icons.schedule, 'color': Color(0xFFB4A7D6)},
+    {'name': 'Đồ điện tử', 'icon': Icons.devices, 'color': Color(0xFF74B9FF)},
+  ];
+
+  Widget _buildCategoryCard(
+      BuildContext context, Map<String, dynamic> categoryItem) {
+    return InkWell(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Xem danh mục: ${categoryItem['name']}'),
+            duration: const Duration(milliseconds: 800),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 35,
+              backgroundColor:
+                  (categoryItem['color'] as Color).withOpacity(0.15),
+              child: Icon(
+                categoryItem['icon'] as IconData,
+                size: 36,
+                color: categoryItem['color'] as Color,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                categoryItem['name'] as String,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -54,19 +130,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   pinned: true,
                   expandedHeight: 120,
                   backgroundColor: Colors.blueAccent,
-                  title: const Text('TH4 - NHÓM 7 MALL', 
-                    style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Colors.white)),
+                  title: const Text('TH4 - NHÓM 7 MALL',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.2,
+                          color: Colors.white)),
                   actions: [
                     Consumer<CartProvider>(
                       builder: (context, cart, child) => Padding(
                         padding: const EdgeInsets.only(right: 16.0, top: 8.0),
                         child: badges.Badge(
-                          badgeStyle: const badges.BadgeStyle(badgeColor: Colors.white),
-                          badgeContent: Text('${cart.cartCount}', 
-                            style: const TextStyle(color: Colors.blueAccent, fontSize: 10, fontWeight: FontWeight.bold)),
-                            child: IconButton(
-                            icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 30),
-                            onPressed: () => Navigator.push(context, CartScreen.route()),
+                          badgeStyle:
+                              const badges.BadgeStyle(badgeColor: Colors.white),
+                          badgeContent: Text('${cart.cartCount}',
+                              style: const TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold)),
+                          child: IconButton(
+                            icon: const Icon(Icons.shopping_bag_outlined,
+                                color: Colors.white, size: 30),
+                            onPressed: () =>
+                                Navigator.push(context, CartScreen.route()),
                           ),
                         ),
                       ),
@@ -78,11 +163,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                       child: Container(
                         height: 45,
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12)),
                         child: const TextField(
                           decoration: InputDecoration(
                             hintText: 'Bạn đang tìm kiếm gì hôm nay?',
-                            prefixIcon: Icon(Icons.search, color: Colors.blueAccent),
+                            prefixIcon:
+                                Icon(Icons.search, color: Colors.blueAccent),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(vertical: 12),
                           ),
@@ -97,105 +185,119 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: CarouselSlider(
-                      options: CarouselOptions(autoPlay: true, aspectRatio: 2.2, enlargeCenterPage: true, viewportFraction: 1.0),
-                      items: productProvider.banners.map((url) => 
-                        ClipRRect(borderRadius: BorderRadius.circular(15), 
-                          child: Image.network(url, fit: BoxFit.cover, width: double.infinity))).toList(),
+                      options: CarouselOptions(
+                          autoPlay: true,
+                          aspectRatio: 2.2,
+                          enlargeCenterPage: true,
+                          viewportFraction: 1.0),
+                      items: productProvider.banners
+                          .map((url) => ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.network(url,
+                                  fit: BoxFit.cover, width: double.infinity)))
+                          .toList(),
                     ),
                   ),
                 ),
 
                 // Categories
-                if (productProvider.categories.isNotEmpty) ...[
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Danh Mục Nổi Bật', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          TextButton(onPressed: (){}, child: const Text('Xem thêm', style: TextStyle(color: Colors.blueAccent))),
-                        ],
-                      ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Danh Mục Nổi Bật',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextButton(
+                            onPressed: () {},
+                            child: const Text('Xem thêm',
+                                style: TextStyle(color: Colors.blueAccent))),
+                      ],
                     ),
                   ),
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        itemCount: productProvider.categories.length,
-                        itemBuilder: (context, index) {
-                          final category = productProvider.categories[index];
-                          return Container(
-                            width: 80,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: Colors.blue[50],
-                                  child: const Icon(Icons.category, color: Colors.blueAccent),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  category,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 230,
+                    child: GridView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.85,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
                       ),
+                      itemCount: _vietnameseCategories.length,
+                      itemBuilder: (context, index) {
+                        final categoryItem = _vietnameseCategories[index];
+                        return _buildCategoryCard(context, categoryItem);
+                      },
                     ),
                   ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                ],
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
                 // Grid Title
                 const SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Text('Gợi Ý Hôm Nay', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent)),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Text('Gợi Ý Hôm Nay',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent)),
                   ),
                 ),
 
                 // Product Grid
-                if (productProvider.products.isEmpty && productProvider.isLoading)
-                  const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: Colors.blueAccent)))
-                else if (productProvider.products.isEmpty && !productProvider.isLoading)
-                  const SliverFillRemaining(child: Center(child: Text("Không có sản phẩm nào!")))
+                if (productProvider.products.isEmpty &&
+                    productProvider.isLoading)
+                  const SliverFillRemaining(
+                      child: Center(
+                          child: CircularProgressIndicator(
+                              color: Colors.blueAccent)))
+                else if (productProvider.products.isEmpty &&
+                    !productProvider.isLoading)
+                  const SliverFillRemaining(
+                      child: Center(child: Text("Không có sản phẩm nào!")))
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     sliver: SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 0.65,
                         mainAxisSpacing: 16,
                         crossAxisSpacing: 16,
                       ),
                       delegate: SliverChildBuilderDelegate(
-                        (ctx, i) => ProductCard(product: productProvider.products[i]),
+                        (ctx, i) =>
+                            ProductCard(product: productProvider.products[i]),
                         childCount: productProvider.products.length,
                       ),
                     ),
                   ),
-                
+
                 // Loading Indicator at bottom (Paginating)
-                if (productProvider.isLoading && productProvider.products.isNotEmpty)
+                if (productProvider.isLoading &&
+                    productProvider.products.isNotEmpty)
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
+                      child: Center(
+                          child: CircularProgressIndicator(
+                              color: Colors.blueAccent)),
                     ),
                   ),
-                
+
                 // Spacing
                 const SliverToBoxAdapter(child: SizedBox(height: 80)),
               ],
@@ -206,4 +308,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
