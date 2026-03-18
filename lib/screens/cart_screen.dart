@@ -74,8 +74,11 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _buildItemWidget(
       BuildContext context, int index, Animation<double>? animation) {
-    final item = _visibleItems[index];
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    if (index >= cartProvider.items.length || index >= _visibleItems.length) {
+      return const SizedBox.shrink();
+    }
+    final item = _visibleItems[index];
     final child = Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -384,11 +387,17 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
 
+    final cartProvider = context.watch<CartProvider>();
+
     return AnimatedList(
       key: _listKey,
-      initialItemCount: _visibleItems.length,
+      initialItemCount: cartProvider.items.length,
       padding: const EdgeInsets.only(bottom: 100),
       itemBuilder: (context, index, animation) {
+        if (index >= cartProvider.items.length ||
+            index >= _visibleItems.length) {
+          return const SizedBox.shrink();
+        }
         final item = _visibleItems[index];
         return Dismissible(
           key: Key('${item.product.id}_${item.size}_${item.color}'),
@@ -501,7 +510,6 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             )
                             .toList();
-
                         Navigator.push(
                           context,
                           MaterialPageRoute(

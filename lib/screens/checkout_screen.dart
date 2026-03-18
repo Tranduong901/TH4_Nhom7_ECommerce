@@ -5,7 +5,6 @@ import '../models/cart_item.dart';
 import '../models/order.dart';
 import '../providers/cart_provider.dart';
 import '../providers/order_provider.dart';
-import 'main_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<CartItem> selectedItems;
@@ -89,10 +88,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     // Remove purchased snapshot items from cart
                     cart.removePurchasedItems(selectedItems);
 
-                    // Navigate to home
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => const MainScreen()),
-                        (route) => false);
+                    // Navigate to /home
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/home', (route) => false);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,

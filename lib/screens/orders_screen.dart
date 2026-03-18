@@ -54,29 +54,33 @@ class _OrdersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orderProvider = context.watch<OrderProvider>();
-    final orders = orderProvider.getOrdersByStatus(status);
+    return Consumer<OrderProvider>(
+      builder: (context, orderProvider, child) {
+        final orders =
+            orderProvider.orders.where((o) => o.status == status).toList();
 
-    if (orders.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('Chưa có đơn hàng nào $status',
-                style: const TextStyle(color: Colors.grey, fontSize: 16)),
-          ],
-        ),
-      );
-    }
+        if (orders.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 80, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text('Chưa có đơn hàng nào $status',
+                    style: const TextStyle(color: Colors.grey, fontSize: 16)),
+              ],
+            ),
+          );
+        }
 
-    return ListView.builder(
-      itemCount: orders.length,
-      padding: const EdgeInsets.all(8),
-      itemBuilder: (context, index) {
-        final order = orders[index];
-        return _OrderCard(order: order);
+        return ListView.builder(
+          itemCount: orders.length,
+          padding: const EdgeInsets.all(8),
+          itemBuilder: (context, index) {
+            final order = orders[index];
+            return _OrderCard(order: order);
+          },
+        );
       },
     );
   }
@@ -100,6 +104,96 @@ class _OrderCard extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+
+  int _getActiveStep(String status) {
+    switch (status) {
+      case 'Chờ xác nhận':
+        return 0;
+      case 'Đang giao':
+        return 1;
+      case 'Đã giao':
+        return 2;
+      default:
+        return -1;
+    }
+  }
+
+  Widget _buildHorizontalStepper() {
+    if (order.status == 'Đã hủy') {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.red.withOpacity(0.4)),
+        ),
+        child: const Text(
+          'Đơn hàng đã hủy',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    final steps = ['Xác nhận', 'Đang giao', 'Đã giao'];
+    final activeStep = _getActiveStep(order.status);
+
+    return Column(
+      children: [
+        Row(
+          children: List.generate(steps.length * 2 - 1, (index) {
+            if (index.isOdd) {
+              final lineStep = index ~/ 2;
+              final isDone = lineStep < activeStep;
+              final lineColor = isDone ? Colors.green : Colors.grey.shade300;
+              return Expanded(
+                child: Container(
+                  height: 3,
+                  color: lineColor,
+                ),
+              );
+            }
+
+            final stepIndex = index ~/ 2;
+            final isActive = stepIndex <= activeStep;
+            final dotColor = isActive ? Colors.green : Colors.grey.shade300;
+
+            return Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: dotColor,
+              ),
+              child: isActive
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : null,
+            );
+          }),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: steps
+              .map(
+                (step) => Text(
+                  step,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
   }
 
   @override
@@ -141,6 +235,9 @@ class _OrderCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+
+            _buildHorizontalStepper(),
             const SizedBox(height: 12),
 
             // Order Items Preview

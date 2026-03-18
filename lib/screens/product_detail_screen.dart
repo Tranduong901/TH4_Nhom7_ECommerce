@@ -221,11 +221,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           .where((i) => i.isSelected)
                           .toList();
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => CheckoutScreen(
-                                    selectedItems: selectedItems,
-                                  )));
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CheckoutScreen(
+                            selectedItems: selectedItems,
+                          ),
+                        ),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
