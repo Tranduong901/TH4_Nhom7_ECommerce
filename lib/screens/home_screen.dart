@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -73,7 +73,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           CircleAvatar(
             radius: 22,
-            backgroundColor: (category['color'] as Color).withOpacity(0.15),
+            backgroundColor:
+                (category['color'] as Color).withValues(alpha: 0.15),
             child: Icon(
               category['icon'] as IconData,
               color: category['color'] as Color,
@@ -98,40 +99,42 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: colorScheme.surface,
       body: Consumer<ProductProvider>(
         builder: (context, productProvider, child) {
           return RefreshIndicator(
             onRefresh: () => productProvider.fetchProducts(refresh: true),
-            color: Colors.blueAccent,
+            color: colorScheme.primary,
             child: CustomScrollView(
               controller: _scrollController,
               slivers: [
                 SliverAppBar(
                   pinned: true,
                   expandedHeight: 120,
-                  backgroundColor: Colors.blueAccent,
-                  title: const Text('TH4 - NHÓM 7 MALL',
+                  backgroundColor: colorScheme.primary,
+                  title: Text('TH4 - NHÓM 7 MALL',
                       style: TextStyle(
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.2,
-                          color: Colors.white)),
+                          color: colorScheme.onPrimary)),
                   actions: [
                     Consumer<CartProvider>(
                       builder: (context, cart, child) => Padding(
                         padding: const EdgeInsets.only(right: 16.0, top: 8.0),
                         child: badges.Badge(
-                          badgeStyle:
-                              const badges.BadgeStyle(badgeColor: Colors.white),
+                          badgeStyle: badges.BadgeStyle(
+                              badgeColor: colorScheme.onPrimary),
                           badgeContent: Text('${cart.cartCount}',
-                              style: const TextStyle(
-                                  color: Colors.blueAccent,
+                              style: TextStyle(
+                                  color: colorScheme.primary,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold)),
                           child: IconButton(
-                            icon: const Icon(Icons.shopping_bag_outlined,
-                                color: Colors.white, size: 30),
+                            icon: Icon(Icons.shopping_bag_outlined,
+                                color: colorScheme.onPrimary, size: 30),
                             onPressed: () =>
                                 Navigator.push(context, CartScreen.route()),
                           ),
@@ -146,15 +149,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         height: 45,
                         decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(12)),
-                        child: const TextField(
+                        child: TextField(
                           decoration: InputDecoration(
                             hintText: 'Bạn đang tìm kiếm gì hôm nay?',
                             prefixIcon:
-                                Icon(Icons.search, color: Colors.blueAccent),
+                                Icon(Icons.search, color: colorScheme.primary),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 12),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
@@ -195,8 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         TextButton(
                             onPressed: () {},
-                            child: const Text('Xem thêm',
-                                style: TextStyle(color: Colors.blueAccent))),
+                            child: Text('Xem thêm',
+                                style: TextStyle(color: colorScheme.primary))),
                       ],
                     ),
                   ),
@@ -223,25 +227,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
                 // Grid Title
-                const SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
                     child: Text('Gợi Ý Hôm Nay',
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent)),
+                            color: colorScheme.primary)),
                   ),
                 ),
 
                 // Product Grid
                 if (productProvider.products.isEmpty &&
                     productProvider.isLoading)
-                  const SliverFillRemaining(
+                  SliverFillRemaining(
                       child: Center(
                           child: CircularProgressIndicator(
-                              color: Colors.blueAccent)))
+                              color: colorScheme.primary)))
                 else if (productProvider.products.isEmpty &&
                     !productProvider.isLoading)
                   const SliverFillRemaining(
@@ -269,12 +273,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Loading Indicator at bottom (Paginating)
                 if (productProvider.isLoading &&
                     productProvider.products.isNotEmpty)
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Center(
                           child: CircularProgressIndicator(
-                              color: Colors.blueAccent)),
+                              color: colorScheme.primary)),
                     ),
                   ),
 

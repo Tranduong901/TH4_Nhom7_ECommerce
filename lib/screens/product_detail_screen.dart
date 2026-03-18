@@ -75,7 +75,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.1),
                                       spreadRadius: 1,
                                       blurRadius: 3)
                                 ]),
@@ -285,7 +286,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: CircleAvatar(
-              backgroundColor: Colors.black.withOpacity(0.3),
+              backgroundColor: Colors.black.withValues(alpha: 0.3),
               child: Consumer<CartProvider>(
                 builder: (context, cart, child) => badges.Badge(
                   badgeStyle:
@@ -542,11 +543,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 p.category == widget.product.category &&
                                 p.id != widget.product.id)
                             .toList();
-                        if (sims.isEmpty)
+                        if (sims.isEmpty) {
                           return Center(
                               child: Text(prodProv.isLoading
                                   ? 'Đang tải...'
                                   : 'Không có sản phẩm tương tự'));
+                        }
                         return ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: sims.length,
@@ -626,9 +628,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Column(
+                  const Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(Icons.chat_outlined, color: Colors.blueAccent),
                       Text('Chat ngay',
                           style:

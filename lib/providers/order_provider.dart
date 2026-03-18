@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/order.dart';
 
 class OrderProvider with ChangeNotifier {
-  List<Order> _orders = [];
+  final List<Order> _orders = [];
 
   List<Order> get orders => _orders;
 

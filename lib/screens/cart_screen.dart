@@ -255,7 +255,7 @@ class _CartScreenState extends State<CartScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // static placeholder for removed item during animation
-            Container(width: 24, height: 24),
+            const SizedBox(width: 24, height: 24),
             const SizedBox(width: 8),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
@@ -363,8 +363,10 @@ class _CartScreenState extends State<CartScreen> {
           children: [
             Icon(Icons.remove_shopping_cart_outlined,
                 size: 80,
-                color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.28)),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.28)),
             const SizedBox(height: 16),
             Text('Giỏ hàng của bạn còn trống',
                 style: TextStyle(

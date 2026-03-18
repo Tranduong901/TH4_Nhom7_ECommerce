@@ -9,23 +9,28 @@ class OrdersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: Colors.grey[100],
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          title: const Text('Đơn Mua Của Tôi',
+          title: Text('Đơn Mua Của Tôi',
               style: TextStyle(
-                  color: Colors.black87, fontWeight: FontWeight.normal)),
-          backgroundColor: Colors.white,
-          iconTheme: const IconThemeData(color: Colors.blueAccent),
+                  color: colorScheme.onSurface, fontWeight: FontWeight.normal)),
+          backgroundColor: colorScheme.surface,
+          iconTheme: IconThemeData(color: colorScheme.primary),
           elevation: 0,
-          bottom: const TabBar(
-              isScrollable: true,
-              labelColor: Colors.blueAccent,
-              unselectedLabelColor: Colors.black54,
-              indicatorColor: Colors.blueAccent,
-              tabs: [
+          bottom: TabBar(
+              isScrollable: false,
+              tabAlignment: TabAlignment.fill,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: colorScheme.primary,
+              unselectedLabelColor: colorScheme.onSurfaceVariant,
+              indicatorColor: colorScheme.primary,
+              tabs: const [
                 Tab(text: 'Chờ xác nhận'),
                 Tab(text: 'Đang giao'),
                 Tab(text: 'Đã giao'),
@@ -64,10 +69,14 @@ class _OrdersList extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 80, color: Colors.grey[400]),
+                Icon(icon,
+                    size: 80,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
                 const SizedBox(height: 16),
                 Text('Chưa có đơn hàng nào $status',
-                    style: const TextStyle(color: Colors.grey, fontSize: 16)),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 16)),
               ],
             ),
           );
@@ -75,7 +84,7 @@ class _OrdersList extends StatelessWidget {
 
         return ListView.builder(
           itemCount: orders.length,
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           itemBuilder: (context, index) {
             final order = orders[index];
             return _OrderCard(order: order);
@@ -119,15 +128,147 @@ class _OrderCard extends StatelessWidget {
     }
   }
 
+  bool get _canCancel {
+    return order.status == 'Chờ xác nhận' || order.status == 'Đang giao';
+  }
+
+  Future<void> _confirmCancelOrder(BuildContext context) async {
+    final orderProvider = context.read<OrderProvider>();
+    final messenger = ScaffoldMessenger.of(context);
+
+    final shouldCancel = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hủy đơn hàng'),
+        content: const Text('Bạn có chắc muốn hủy đơn hàng này không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Không'),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hủy đơn'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldCancel == true) {
+      orderProvider.cancelOrder(order.id);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Đã hủy đơn hàng')),
+      );
+    }
+  }
+
+  void _showOrderDetails(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: SizedBox(
+          height: MediaQuery.of(ctx).size.height * 0.75,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(
+                'Chi tiết đơn #${order.id.substring(0, 8)}',
+                style: Theme.of(ctx)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Trạng thái: ${order.status}'),
+                    const SizedBox(height: 6),
+                    Text('Địa chỉ: ${order.shippingAddress}'),
+                    const SizedBox(height: 6),
+                    Text(order.paymentMethod == 'COD'
+                        ? 'Thanh toán: Khi nhận hàng'
+                        : 'Thanh toán: Ví MoMo'),
+                    const SizedBox(height: 6),
+                    Text('Ngày đặt: ${_formatDate(order.createdAt)}'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              const Text('Sản phẩm',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 8),
+              ...order.items.map(
+                (item) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
+                      imageUrl: item.product.image,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  title: Text(
+                    item.product.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle:
+                      Text('${item.color}, ${item.size}  •  x${item.quantity}'),
+                  trailing: Text(
+                    '\$${(item.product.price * item.quantity).toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const Divider(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Tổng thanh toán',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  Text(
+                    '\$${order.totalAmount.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHorizontalStepper() {
     if (order.status == 'Đã hủy') {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.08),
+          color: Colors.red.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.red.withOpacity(0.4)),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
         ),
         child: const Text(
           'Đơn hàng đã hủy',
@@ -201,10 +342,10 @@ class _OrderCard extends StatelessWidget {
     final firstItem = order.items.isNotEmpty ? order.items.first : null;
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -212,16 +353,22 @@ class _OrderCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Đơn hàng #${order.id.substring(0, 8)}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14),
+                Expanded(
+                  child: Text(
+                    'Đơn hàng #${order.id.substring(0, 8)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getStatusColorValue(order.status).withOpacity(0.2),
+                    color: _getStatusColorValue(order.status)
+                        .withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -269,10 +416,11 @@ class _OrderCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${firstItem.color}, ${firstItem.size} x${firstItem.quantity}',
-                          style:
-                              TextStyle(color: Colors.grey[600], fontSize: 12),
-                        ),
+                            '${firstItem.color}, ${firstItem.size} x${firstItem.quantity}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 12)),
                         if (order.items.length > 1)
                           Text(
                             '...và ${order.items.length - 1} sản phẩm khác',
@@ -282,10 +430,10 @@ class _OrderCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           '\$${order.totalAmount.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            color: Colors.blueAccent,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 15,
                           ),
                         ),
                       ],
@@ -300,6 +448,7 @@ class _OrderCard extends StatelessWidget {
             // Order Details
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
@@ -321,26 +470,48 @@ class _OrderCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Hình thức:',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      order.paymentMethod == 'COD'
-                          ? 'Thanh toán khi nhận'
-                          : 'Ví MoMo',
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500),
-                    ),
-                  ],
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 140),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Hình thức:',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        order.paymentMethod == 'COD'
+                            ? 'Thanh toán khi nhận'
+                            : 'Ví MoMo',
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
+
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _showOrderDetails(context),
+                  icon: const Icon(Icons.visibility_outlined, size: 18),
+                  label: const Text('Xem chi tiết'),
+                ),
+                const SizedBox(width: 8),
+                if (_canCancel)
+                  FilledButton.tonalIcon(
+                    onPressed: () => _confirmCancelOrder(context),
+                    icon: const Icon(Icons.cancel_outlined, size: 18),
+                    label: const Text('Hủy đơn'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
 
             // Order Date
             Text(
